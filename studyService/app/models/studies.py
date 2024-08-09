@@ -12,4 +12,3 @@ class StudyModel(Base):
     id_content: Mapped[int] = mapped_column(nullable=False)
     id_kinescope_folder: Mapped[str] = mapped_column(nullable=True)
     type_content: Mapped[int] = mapped_column(nullable=True)  # 1 - text, 2 - video
-    

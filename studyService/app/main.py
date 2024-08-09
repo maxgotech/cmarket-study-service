@@ -7,12 +7,14 @@ from contextlib import asynccontextmanager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # init db
+    # init db before app
     await init_db()
     yield
 
-
+# init app
 app = FastAPI(
     title=settings.PROJECT_NAME, version=settings.PROJECT_VERSION, lifespan=lifespan
 )
+
+# add router to app
 app.include_router(router)
