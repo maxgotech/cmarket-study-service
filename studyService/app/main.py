@@ -1,19 +1,18 @@
 from fastapi import FastAPI
 from app.api import router
 from app.core.config import settings
-from app.models.base import Base
-from app.core.session import engine
+from app.core.session import init_db
+from contextlib import asynccontextmanager
 
 
-def create_tables():
-    Base.metadata.create_all(bind=engine)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # init db
+    await init_db()
+    yield
 
 
-def start_application():
-    app = FastAPI(title=settings.PROJECT_NAME, version=settings.PROJECT_VERSION)
-    app.include_router(router)
-    create_tables()
-    return app
-
-
-app = start_application()
+app = FastAPI(
+    title=settings.PROJECT_NAME, version=settings.PROJECT_VERSION, lifespan=lifespan
+)
+app.include_router(router)
