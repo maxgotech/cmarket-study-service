@@ -10,7 +10,7 @@ from app.models.base import Base
 from app.core.config import settings
 from typing import AsyncGenerator
 
-engine: AsyncEngine = create_async_engine(settings.DATABASE_URL)
+engine: AsyncEngine = create_async_engine(settings.DATABASE_URI)
 
 SessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 
