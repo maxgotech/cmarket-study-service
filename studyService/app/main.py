@@ -1,8 +1,15 @@
 from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from app.api import router
 from app.core.config import settings
 from app.core.session import init_db
 from contextlib import asynccontextmanager
+import time
+
+import asyncio
+import uvloop
+
+asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 
 @asynccontextmanager
