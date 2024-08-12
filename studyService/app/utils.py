@@ -28,30 +28,3 @@ async def delete_study_folder(study_id: int, dir="assets/studies") -> str:
 class KinescopeFolderInfo(TypedDict):
     name: str
     id: int
-
-
-async def create_kinescope_folder(id: int) -> KinescopeFolderInfo:
-    folder_name = "study_" + str(id)
-    
-    # Kinescope changed their API so porevious request fails
-    # TODO(Maxim): Update kinescope API requests
-    
-    # async with httpx.AsyncClient() as client:
-    #     response = client.post(
-    #         "https://api.kinescope.io/v1/projects/"
-    #         + os.environ["API_KINESCOPE_PARENT_ID"]
-    #         + "/folders",
-    #         headers={"Authorization": "Bearer " + os.environ["API_KINESCOPE_TOKEN"]},
-    #         data={"name": folder_name},
-    #     )
-    #     res = (await response).json()
-    #     print(res)
-    #     return res
-    
-    # emulatuing Kinescope Request
-    await asyncio.sleep(2)
-    
-    return {
-        'name': folder_name,
-        'id' : id
-    }

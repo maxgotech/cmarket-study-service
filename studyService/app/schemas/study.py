@@ -23,7 +23,3 @@ class StudyOut(BaseModel):
     id_content: int
     id_kinescope_folder: str
     type_content: int
-
-
-class StudyTest(BaseModel):
-    id: int
