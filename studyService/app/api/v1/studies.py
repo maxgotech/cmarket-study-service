@@ -3,8 +3,11 @@ from app.core.session import get_db
 from app.crud.studies import crud_study
 from fastapi import status
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.schemas.study import StudyOut
-
+from sqlalchemy import select
+from app.schemas.study import StudyOut, StudyCreate
+from app.models.user import UserModel
+import app.utils as utils
+import asyncio
 
 router = APIRouter(prefix="/studies", tags=["Studies"])
 
@@ -30,4 +33,40 @@ async def get_study(id: int, db: AsyncSession = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Study not found"
         )
+    return study
+
+
+@router.post("/")
+async def create_study(study_in: StudyCreate, db: AsyncSession = Depends(get_db)):
+    """
+    Create study
+    """
+    # check if user exists
+    # preferably this should be send to users service but i will keep this here
+    # since services have different db instances if launched with docker
+    # TODO(Maxim) need to create some kind of multirepo to start all services with single docker compose
+    check_for_user = (
+        (await db.execute(select(UserModel).where(UserModel.id == study_in.userid)))
+        .scalars()
+        .first()
+    )
+
+    if not check_for_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+
+    # create study in db
+    study = await crud_study.create(db, study_in)
+
+    # TODO(Maxim) add update for kinescope folder after creation of study
+    # create folders for future file uploads
+    try:
+        await asyncio.gather(
+            utils.create_study_folder(study.id),
+            utils.create_kinescope_folder(study.id),
+        )
+    except Exception as e:
+        raise e
+
     return study

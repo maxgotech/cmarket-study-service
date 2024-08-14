@@ -21,6 +21,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db_obj = self._model(**obj_in_data)
         session.add(db_obj)
         await session.commit()
+        await session.refresh(db_obj) # for relationship load
         return db_obj
 
     async def get(self, session: AsyncSession, *args, **kwargs) -> Optional[ModelType]:

@@ -4,7 +4,7 @@ from typing import Optional
 
 class StudyCreate(BaseModel):
     name: str
-    user: str
+    userid: int
 
 
 class StudyUpdate(BaseModel):
@@ -25,5 +25,3 @@ class StudyOut(BaseModel):
     type_content: Optional[int]
 
 
-class StudyTest(BaseModel):
-    id: int
