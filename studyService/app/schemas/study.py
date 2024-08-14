@@ -12,14 +12,18 @@ class StudyUpdate(BaseModel):
     name: Optional[str]
     type_content: Optional[int]
     id_content: Optional[int]
-    course: Optional[int]
-    module: Optional[int]
+    courseid: Optional[int]
+    moduleid: Optional[int]
 
 
 class StudyOut(BaseModel):
     id: int
     name: str
     study_order: int
-    id_content: int
+    id_content: Optional[int]
     id_kinescope_folder: str
-    type_content: int
+    type_content: Optional[int]
+
+
+class StudyTest(BaseModel):
+    id: int
