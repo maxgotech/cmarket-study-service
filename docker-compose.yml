@@ -1,0 +1,44 @@
+version: '3.1'
+
+services:
+  db:
+    image: mariadb:10.6
+    container_name: dbStudy
+    restart: unless-stopped
+    ports:
+      - "6033:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - ./studyService/db:/docker-entrypoint-initdb.d
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: pmaStudy
+    restart: unless-stopped
+    links:
+      - db
+    ports:
+      - 8080:80
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+      MYSQL_ROOT_PASSWORD: root
+    depends_on:
+      - db
+  
+  api:
+    container_name: cmarket-study-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+     - "8000:80"
+    links:
+     - db
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      DATABASE_URI: mysql+asyncmy://root:root@db/courses
