@@ -36,7 +36,7 @@ async def get_study(id: int, db: AsyncSession = Depends(get_db)):
     return study
 
 
-@router.post("/")
+@router.post("/", response_model=StudyOut, status_code=status.HTTP_201_CREATED)
 async def create_study(study_in: StudyCreate, db: AsyncSession = Depends(get_db)):
     """
     Create study

@@ -21,7 +21,8 @@ class StudyOut(BaseModel):
     name: str
     study_order: int
     id_content: Optional[int]
-    id_kinescope_folder: str
+
+    # TODO(Maxim) remove Optional once update on folder after creation
+    # is implemented
+    id_kinescope_folder: Optional[str]
     type_content: Optional[int]
-
-
