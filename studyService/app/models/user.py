@@ -1,7 +1,9 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base_class import Base
 from typing import TYPE_CHECKING
-if  TYPE_CHECKING:
+
+# needed to avoid circular imports
+if TYPE_CHECKING:
     from app.models.studies import StudyModel
 
 
