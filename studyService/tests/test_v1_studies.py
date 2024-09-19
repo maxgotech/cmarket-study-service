@@ -6,7 +6,6 @@ from dataclasses import dataclass
 from typing import Any
 from fastapi import status
 from unittest.mock import patch, AsyncMock
-from tests.db_mock import db_obj_dummy
 from app.models.studies import StudyModel
 from typing import Any
 from app.schemas.study import StudyCreate
