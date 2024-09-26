@@ -10,4 +10,6 @@ RUN pip install --no-cache-dir --upgrade -r /docker-cmarket-study-service/requir
 
 COPY /studyService/app /docker-cmarket-study-service/app
 
+COPY /kui /docker-cmarket-study-service/kui
+
 CMD ["fastapi", "run", "app/main.py", "--port", "80"]
