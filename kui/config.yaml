@@ -1,0 +1,9 @@
+kafka:
+  clusters:
+    - name: cmarket
+      bootstrapServers: kafka:29092
+      schemaRegistry: http://localhost:8085
+      topic: "cmarket-study"
+      metrics:
+        port: 9997
+        type: JMX
