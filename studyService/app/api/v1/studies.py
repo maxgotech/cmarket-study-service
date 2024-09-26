@@ -1,25 +1,40 @@
 from fastapi import APIRouter, Depends, HTTPException
 from app.core.session import get_db
 from app.crud.studies import crud_study
-from fastapi import status
+from fastapi import status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.schemas.study import StudyOut, StudyCreate
 from app.models.user import UserModel
 import app.utils as utils
 import asyncio
+from app.kafka.producer import send_one
 
 router = APIRouter(prefix="/studies", tags=["Studies"])
 
 
 @router.get("/", response_model=list[StudyOut], status_code=status.HTTP_200_OK)
 async def get_studies(
-    skip: int = 0, limit: int = 100, db: AsyncSession = Depends(get_db)
+    request: Request,
+    skip: int = 0,
+    limit: int = 100,
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Get multiple studies
     """
     studies = await crud_study.get_multi(db, offset=skip, limit=limit)
+
+    client_host = request.client
+    asyncio.create_task(
+        send_one(
+            b"GET studies/",
+            bytes(
+                f"gathering studies by request from {client_host}",
+                encoding="utf-8",
+            ),
+        )
+    )
     return studies
 
 
