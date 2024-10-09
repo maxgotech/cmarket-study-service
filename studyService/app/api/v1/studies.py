@@ -102,9 +102,5 @@ async def update_study(study_in: StudyUpdate, db: AsyncSession = Depends(get_db)
     # get study will raise 404 if no study is not found
     await get_study(study_in.id, db)
 
-    # if not check_for_study:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-    #     )
 
     return await crud_study.update(db, study_in)

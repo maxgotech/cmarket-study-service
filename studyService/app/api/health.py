@@ -17,5 +17,5 @@ async def health(db: AsyncSession = Depends(get_db)):
     try:
         await asyncio.wait_for(db.execute(select(1)), timeout=1)
     except (asyncio.TimeoutError, socket.gaierror):
-        return Response(status_code=503)
-    return Response(status_code=204)
+        return Response(status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
