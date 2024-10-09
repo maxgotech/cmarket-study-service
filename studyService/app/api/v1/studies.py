@@ -4,7 +4,7 @@ from app.crud.studies import crud_study
 from fastapi import status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from app.schemas.study import StudyOut, StudyCreate
+from app.schemas.study import StudyOut, StudyCreate, StudyUpdate
 from app.models.user import UserModel
 import app.utils as utils
 import asyncio
@@ -85,3 +85,26 @@ async def create_study(study_in: StudyCreate, db: AsyncSession = Depends(get_db)
         raise e
 
     return study
+
+
+@router.patch("/", response_model=StudyOut, status_code=status.HTTP_200_OK)
+async def update_study(study_in: StudyUpdate, db: AsyncSession = Depends(get_db)):
+    """
+    Update study
+    """
+
+    # if no id then we cant find the
+    if study_in.id == None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid body request"
+        )
+
+    # get study will raise 404 if no study is not found
+    await get_study(study_in.id, db)
+
+    # if not check_for_study:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+    #     )
+
+    return await crud_study.update(db, study_in)

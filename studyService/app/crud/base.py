@@ -45,7 +45,6 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     async def update(
         self,
         session: AsyncSession,
-        *,
         obj_in: UpdateSchemaType | Dict[str, Any],
         db_obj: Optional[ModelType] = None,
         **kwargs
