@@ -19,23 +19,25 @@ class Case:
     status: int
 
 
-@patch("app.api.v1.studies.crud_study")
 @pytest.mark.anyio
-async def test_get_studies(mock_crud, async_client):
-    # mock for return value
-    mock_response = AsyncMock()
-    # setting the value that db would have returned
-    mock_response.return_value = [StudyModel(id=1, name="Study", study_order=1)]
-    # setting the mock
-    mock_crud.get_multi = mock_response
+async def test_get_studies(async_client):
+    with (
+        patch("app.api.v1.studies.crud_study") as mock_crud,
+        patch("app.api.v1.studies.send_one", AsyncMock(return_value=None)),
+    ):
+        # mock for return value
+        mock_response = AsyncMock()
+        # setting the value that db would have returned
+        mock_response.return_value = [StudyModel(id=1, name="Study", study_order=1)]
+        # setting the mock
+        mock_crud.get_multi = mock_response
 
-    res = await async_client.get("/api/v1/studies/")
-    assert res.status_code == status.HTTP_200_OK
+        res = await async_client.get("/api/v1/studies/")
+        assert res.status_code == status.HTTP_200_OK
 
 
-@patch("app.api.v1.studies.crud_study")
 @pytest.mark.anyio
-async def test_create_study(mock_crud, async_client):
+async def test_create_study(async_client):
     cases: list[Case] = [
         Case(
             name="USER NOT FOUND",
@@ -56,17 +58,20 @@ async def test_create_study(mock_crud, async_client):
             status=status.HTTP_422_UNPROCESSABLE_ENTITY,
         ),
     ]
+    with (
+        patch("app.api.v1.studies.crud_study") as mock_crud,
+        patch("app.api.v1.studies.send_one", AsyncMock(return_value=None)),
+    ):
+        for tc in cases:
+            mock_response = AsyncMock()
+            mock_response.return_value = tc.values
+            mock_crud.create = mock_response
 
-    for tc in cases:
-        mock_response = AsyncMock()
-        mock_response.return_value = tc.values
-        mock_crud.create = mock_response
-
-        res = await async_client.post(
-            "/api/v1/studies/",
-            data=json.dumps(tc.data.dict()),
-        )
-        assert res.status_code == tc.status, tc.name
+            res = await async_client.post(
+                "/api/v1/studies/",
+                data=json.dumps(tc.data.dict()),
+            )
+            assert res.status_code == tc.status, tc.name
 
 
 if __name__ == "__main__":
