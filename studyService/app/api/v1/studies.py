@@ -102,5 +102,18 @@ async def update_study(study_in: StudyUpdate, db: AsyncSession = Depends(get_db)
     # get study will raise 404 if no study is not found
     await get_study(study_in.id, db)
 
-
     return await crud_study.update(db, study_in)
+
+
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_study(id: int, db: AsyncSession = Depends(get_db)):
+    """
+    Delete study
+    """
+
+    # get study will raise 404 if no study is not found
+    await get_study(id, db)
+
+    await crud_study.delete(db, id=id)
+    
+    return
