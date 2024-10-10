@@ -51,6 +51,14 @@ async def get_study(id: int, db: AsyncSession = Depends(get_db)):
     return study
 
 
+async def get_user(db: AsyncSession, id: int):
+    return (
+        (await db.execute(select(UserModel).where(UserModel.id == id)))
+        .scalars()
+        .first()
+    )
+
+
 @router.post("/", response_model=StudyOut, status_code=status.HTTP_201_CREATED)
 async def create_study(study_in: StudyCreate, db: AsyncSession = Depends(get_db)):
     """
@@ -60,11 +68,7 @@ async def create_study(study_in: StudyCreate, db: AsyncSession = Depends(get_db)
     # preferably this should be send to users service but i will keep this here
     # since services have different db instances if launched with docker
     # TODO(Maxim) need to create some kind of multirepo to start all services with single docker compose
-    check_for_user = (
-        (await db.execute(select(UserModel).where(UserModel.id == study_in.userid)))
-        .scalars()
-        .first()
-    )
+    check_for_user = await get_user(db, study_in.userid)
 
     if not check_for_user:
         raise HTTPException(
@@ -93,12 +97,6 @@ async def update_study(study_in: StudyUpdate, db: AsyncSession = Depends(get_db)
     Update study
     """
 
-    # if no id then we cant find the
-    if study_in.id == None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid body request"
-        )
-
     # get study will raise 404 if no study is not found
     await get_study(study_in.id, db)
 
@@ -115,5 +113,5 @@ async def delete_study(id: int, db: AsyncSession = Depends(get_db)):
     await get_study(id, db)
 
     await crud_study.delete(db, id=id)
-    
+
     return

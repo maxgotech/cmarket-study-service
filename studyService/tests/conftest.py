@@ -1,9 +1,9 @@
 import asyncio
 import pytest
 
-from asgi_lifespan import LifespanManager
 from httpx import AsyncClient
 from app.main import app
+from app.core.session import get_db
 
 
 # run only asyncio, not trio
@@ -14,7 +14,8 @@ def anyio_backend():
 
 @pytest.fixture(scope="session")
 async def async_client():
-    async with AsyncClient(app=app, base_url="http://test") as ac, LifespanManager(app):
+    app.dependency_overrides[get_db] = override_get_db
+    async with AsyncClient(app=app, base_url="http://test") as ac:
         yield ac
 
 
@@ -25,3 +26,16 @@ def event_loop():
     loop = asyncio.get_event_loop()
     yield loop
     loop.close()
+
+
+class MockDb:
+    async def execute(self, *args, **kwargs):
+        return 1
+
+    async def close(self):
+        return
+
+
+# override db injection
+async def override_get_db():
+    yield MockDb()
