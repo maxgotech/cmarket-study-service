@@ -164,5 +164,41 @@ async def test_update_study(async_client):
             assert res.status_code == tc.status, tc.name
 
 
+@pytest.mark.anyio
+async def test_delete_study(async_client):
+    cases: list[Case] = [
+        Case(
+            name="INVALID REQUEST BODY",
+            data=None,
+            values=None,
+            addon=None,
+            status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        ),
+        Case(
+            name="STUDY NOT FOUND",
+            data=5,
+            values=None,
+            addon=None,
+            status=status.HTTP_404_NOT_FOUND,
+        ),
+        Case(
+            name="OK",
+            data=5,
+            values=None,
+            addon=StudyModel(id=1, name="Study", study_order=1, userid=1),
+            status=status.HTTP_204_NO_CONTENT,
+        ),
+    ]
+    with (
+        patch("app.api.v1.studies.crud_study") as mock_crud,
+        patch("app.api.v1.studies.send_one", AsyncMock(return_value=None)),
+    ):
+        for tc in cases:
+            mock_crud.delete = AsyncMock(return_value=tc.values)
+            mock_crud.get = AsyncMock(return_value=tc.addon)
+            res = await async_client.delete("/api/v1/studies/" + str(tc.data))
+            assert res.status_code == tc.status, tc.name
+
+
 if __name__ == "__main__":
     unittest.main()
