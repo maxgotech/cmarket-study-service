@@ -36,11 +36,6 @@ class MockDb:
         return
 
 
-@pytest.fixture(scope="session")
-def db():
-    return MockDb
-
-
 # override db injection
 async def override_get_db():
     yield MockDb()
