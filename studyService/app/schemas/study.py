@@ -28,3 +28,4 @@ class StudyOut(BaseModel):
         None, description="id of kinescope folder"
     )
     type_content: Optional[int] = Field(None, description="type of study content")
+    userid: int = Field(None, description="id of user creator")
